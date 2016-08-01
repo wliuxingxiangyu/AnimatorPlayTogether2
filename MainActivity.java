@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,14 +21,19 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mtv;
     private Button mBbtnStart,mBtnCancel,mbtnB;
-    private  float widthTV,heightTV;
+    private  float widthTV,heightTV,scaleX,scaleY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mtv = (TextView) findViewById(R.id.tv);
-
+        //设置控件宽高
+        ViewGroup.LayoutParams lp=mtv.getLayoutParams();
+//        lp.width=48;//1080/48= 22.5商scaleX为分数形式。动画结束后left=0.
+        lp.width=51;//1080/48=20.768230商scaleX 不为分数形式。动画结束后left=1.
+        lp.height=53;
+        mtv.setLayoutParams(lp);
 
         mBbtnStart=(Button) findViewById(R.id.btnStart);
         mBtnCancel=(Button) findViewById(R.id.btnCancle);
@@ -52,27 +58,9 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent=new Intent(MainActivity.this,Bactivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-
             }
         });
 
-
-    }
-
-    private void CancleAnimation() {
-        Log.e("CancleAnimation()","------------");
-        float scale=mtv.getWidth()/widthTV;//mtv.getWidth()在动画过程中一直未变，原来的宽度。
-        Log.e("CancleAnimation()","scale="+scale+
-                ",mtv.getWidth()="+mtv.getWidth()+",widthTV="+widthTV);
-
-        AnimatorSet set = new AnimatorSet();
-        set.setDuration(600);
-        set.playTogether(
-                ObjectAnimator.ofFloat(mtv, View.SCALE_X, scale),
-                ObjectAnimator.ofFloat(mtv, View.SCALE_Y, scale)
-        );
-
-        set.start();
     }
 
     public void StartAnimation( ){
@@ -92,12 +80,11 @@ public class MainActivity extends AppCompatActivity {
         offset[0]=po.x/2-centerCoor[0];
         offset[1]=po.y/2-centerCoor[1];
 
-        float scaleX=po.x/widthTV;
-        float scaleY=po.y/heightTV;
+        scaleX=po.x/widthTV;
+        scaleY=po.y/heightTV;
         Log.e("StartAnimation()","scaleX="+scaleX+",scaleY="+scaleY+
                 ",heightTV="+heightTV+",po.y="+po.y+
                 ",widthTV="+widthTV+",po.x="+po.x );
-
 
         AnimatorSet set = new AnimatorSet();
         set.setDuration(600);
@@ -117,8 +104,28 @@ public class MainActivity extends AppCompatActivity {
                 int[] leftTopCoor = new int[2];
                 mtv.getLocationOnScreen(leftTopCoor);
                 Log.e("onAnimationEnd()--","left="+leftTopCoor[0]+",top="+leftTopCoor[1]);
+                Log.e("onAnimationEnd()--","mtv.getWidth()="+mtv.getWidth()
+                        +",scaleX="+scaleX
+                        +",mtv.getWidth()*scaleX="+mtv.getWidth()*scaleX);
+
             }
         });
+    }
+
+    private void CancleAnimation() {
+        Log.e("CancleAnimation()","------------");
+        float scale=mtv.getWidth()/widthTV;//mtv.getWidth()在动画过程中一直未变，原来的宽度。
+        Log.e("CancleAnimation()","scale="+scale+
+                ",mtv.getWidth()="+mtv.getWidth()+",widthTV="+widthTV);
+
+        AnimatorSet set = new AnimatorSet();
+        set.setDuration(600);
+        set.playTogether(
+                ObjectAnimator.ofFloat(mtv, View.SCALE_X, scale),
+                ObjectAnimator.ofFloat(mtv, View.SCALE_Y, scale)
+        );
+
+        set.start();
     }
 
 }
